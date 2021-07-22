@@ -1,0 +1,250 @@
+diff --git a/tensorflow/lite/kernels/BUILD b/tensorflow/lite/kernels/BUILD
+index f3a639ad0c6..7cd6d3404bb 100644
+--- a/tensorflow/lite/kernels/BUILD
++++ b/tensorflow/lite/kernels/BUILD
+@@ -571,6 +571,7 @@ BUILTIN_KERNEL_SRCS = [
+     "gather_nd.cc",
+     "hashtable_lookup.cc",
+     "if.cc",
++    "random_uniform.cc",
+     "l2norm.cc",
+     "local_response_norm.cc",
+     "logical.cc",
+diff --git a/tensorflow/lite/kernels/random_uniform.cc b/tensorflow/lite/kernels/random_uniform.cc
+new file mode 100644
+index 00000000000..a42ec678060
+--- /dev/null
++++ b/tensorflow/lite/kernels/random_uniform.cc
+@@ -0,0 +1,146 @@
++/*
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Copyright (C) 2021, Arm Limited and contributors
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include <math.h>
++#include <stddef.h>
++#include <stdint.h>
++
++#include <vector>
++#include <random>
++#include <chrono>
++
++#include "tensorflow/lite/c/common.h"
++#include "tensorflow/lite/kernels/internal/optimized/optimized_ops.h"
++#include "tensorflow/lite/kernels/internal/reference/reference_ops.h"
++#include "tensorflow/lite/kernels/internal/tensor.h"
++#include "tensorflow/lite/kernels/internal/tensor_ctypes.h"
++#include "tensorflow/lite/kernels/kernel_util.h"
++#include "flatbuffers/flexbuffers.h"  // from @flatbuffers
++
++namespace tflite {
++namespace ops {
++namespace custom {
++namespace random_uniform {
++
++    typedef struct {
++        int seed;
++        int seed2;
++    } TfLiteRandomUniformParams;
++
++    template <typename Float>
++    TfLiteStatus RandomUniformSample(int seed, int seed2, Float* output, size_t output_size) {
++        //TODO: handle optional seeds
++        // Generate a proper random generator
++        std::random_device rd;
++        std::seed_seq ss{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() };
++        std::default_random_engine generator{ss};
++
++        // Create a distribution and bind it to the generator
++        std::uniform_real_distribution<Float> dist(0.0, 1.0);
++        auto rand = std::bind(dist, generator);
++        for ( Float* it = output; it != output + output_size; it++ ) {
++            *it = rand();
++        }
++        return kTfLiteOk;
++    }
++
++
++    TfLiteStatus RandomUniformSample(TfLiteContext* context,
++                                     int seed,
++                                     int seed2,
++                                     TfLiteTensor* output,
++                                     size_t output_size) {
++
++        switch(output->type) {
++            case kTfLiteFloat32:
++                TF_LITE_ENSURE_OK(context, RandomUniformSample<float>(seed, seed2, GetTensorData<float>(output), output_size)); 
++                break;
++            case kTfLiteFloat64:
++                TF_LITE_ENSURE_OK(context, RandomUniformSample<double>(seed, seed2, GetTensorData<double>(output), output_size)); 
++                break;
++            default:
++                TF_LITE_KERNEL_LOG(
++                        context, "Unsupported output datatype for RandomUniformSample: %s",
++                        TfLiteTypeGetName(output->type));
++                return kTfLiteError;
++        }
++        return kTfLiteOk;
++    }
++
++    void* RandomUniformInit(TfLiteContext* context, const char* buffer, size_t length) {
++        auto* data = new TfLiteRandomUniformParams;
++        const uint8_t* buffer_t = reinterpret_cast<const uint8_t*>(buffer);
++
++        const flexbuffers::Map& m = flexbuffers::GetRoot(buffer_t, length).AsMap();
++        data->seed  = m["seed "].AsInt32();
++        data->seed2 = m["seed2"].AsInt32();
++
++        return data;
++    }
++
++    void RandomUniformFree(TfLiteContext* context, void* buffer) {
++        auto* params = reinterpret_cast<TfLiteRandomUniformParams*>(buffer);
++        delete params;
++    }
++
++    TfLiteStatus RandomUniformPrepare(TfLiteContext* context, TfLiteNode* node) {
++        TF_LITE_ENSURE_EQ(context, NumInputs(node), 1);
++        TF_LITE_ENSURE_EQ(context, NumOutputs(node), 1);
++
++        // Input is a shape tensor
++        const TfLiteTensor* input = GetInput(context, node, 0);
++        TF_LITE_ENSURE_EQ(context, NumDimensions(input), 1);
++        TF_LITE_ENSURE_EQ(context, input->type, kTfLiteInt32);
++
++        int output_dims = SizeOfDimension(input, 0);
++        TfLiteIntArray* output_shape = TfLiteIntArrayCreate(output_dims);
++        for ( int i = 0; i < output_dims; i++ ) {
++            output_shape->data[i] = input->data.i32[i];
++        }
++
++        TfLiteTensor* output = GetOutput(context, node, 0);
++        return context->ResizeTensor(context, output, output_shape);
++    }
++
++    TfLiteStatus RandomUniformEval(TfLiteContext* context, TfLiteNode* node) {
++        auto* params = reinterpret_cast<TfLiteRandomUniformParams*>(node->user_data);
++
++        TfLiteTensor* output = GetOutput(context, node, 0);
++        size_t output_size = NumElements(output);
++
++        TF_LITE_ENSURE_OK(context, RandomUniformSample(context, params->seed, params->seed2, output, output_size));
++
++        return kTfLiteOk;
++    }
++}  // namespace random_uniform
++
++    /*
++     * Register the custom operator
++     */
++    TfLiteRegistration* Register_RANDOM_UNIFORM() {
++        static TfLiteRegistration r = { 
++            random_uniform::RandomUniformInit,
++            random_uniform::RandomUniformFree,
++            random_uniform::RandomUniformPrepare,
++            random_uniform::RandomUniformEval};
++        return &r;
++    }
++
++}  // namespace custom
++}  // namespace ops
++}  // namespace tflite
+diff --git a/tensorflow/lite/kernels/register.cc b/tensorflow/lite/kernels/register.cc
+index d2bb6dfd632..49ace631db8 100644
+--- a/tensorflow/lite/kernels/register.cc
++++ b/tensorflow/lite/kernels/register.cc
+@@ -1,3 +1,21 @@
++/*
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Copyright (C) 2021, Arm Limited and contributors
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
+ /* Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -28,6 +46,7 @@ TfLiteRegistration* Register_NUMERIC_VERIFY();
+ TfLiteRegistration* Register_AUDIO_SPECTROGRAM();
+ TfLiteRegistration* Register_MFCC();
+ TfLiteRegistration* Register_DETECTION_POSTPROCESS();
++TfLiteRegistration* Register_RANDOM_UNIFORM();
+ 
+ }  // namespace custom
+ 
+@@ -303,6 +322,8 @@ BuiltinOpResolver::BuiltinOpResolver() {
+             tflite::ops::custom::Register_AUDIO_SPECTROGRAM());
+   AddCustom("TFLite_Detection_PostProcess",
+             tflite::ops::custom::Register_DETECTION_POSTPROCESS());
++  AddCustom("RandomUniform",
++            tflite::ops::custom::Register_RANDOM_UNIFORM());
+ }
+ 
+ OpResolver::TfLiteDelegatePtrVector BuiltinOpResolver::GetDelegates(
+diff --git a/tensorflow/lite/kernels/register_ref.cc b/tensorflow/lite/kernels/register_ref.cc
+index b9a5b13b477..609195fc566 100644
+--- a/tensorflow/lite/kernels/register_ref.cc
++++ b/tensorflow/lite/kernels/register_ref.cc
+@@ -1,3 +1,21 @@
++/*
++ * SPDX-License-Identifier: Apache-2.0
++ *
++ * Copyright (C) 2021, Arm Limited and contributors
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
+ /* Copyright 2018 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -29,6 +47,7 @@ TfLiteRegistration* Register_NUMERIC_VERIFY_REF();
+ TfLiteRegistration* Register_AUDIO_SPECTROGRAM();
+ TfLiteRegistration* Register_MFCC();
+ TfLiteRegistration* Register_DETECTION_POSTPROCESS();
++TfLiteRegistration* Register_RANDOM_UNIFORM();
+ 
+ }  // namespace custom
+ 
+@@ -457,6 +476,8 @@ BuiltinRefOpResolver::BuiltinRefOpResolver() {
+             tflite::ops::custom::Register_AUDIO_SPECTROGRAM());
+   AddCustom("TFLite_Detection_PostProcess",
+             tflite::ops::custom::Register_DETECTION_POSTPROCESS());
++  AddCustom("RandomUniform",
++            tflite::ops::custom::Register_RANDOM_UNIFORM());
+ }
+ 
+ }  // namespace builtin
