@@ -1,7 +1,5 @@
 # Fast Probabilistic Models
 
-[[_TOC_]]
-
 # Introduction
 
 This repository introduces Axolotl, an Arm-developed framework that can generate probabilistic models from, virtually, any ML model.

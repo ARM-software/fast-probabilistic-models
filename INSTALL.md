@@ -1,5 +1,3 @@
-[[_TOC_]]
-
 The code itself does not require installation apart from its dependencies. Nevertheless, this code makes use of Dropout layers during inference, which is not supported by TensorFlow Lite at the moment. In order to support it, we provide a patch for TensorFlow 2.4.1 which adds the needed operators so Dropout layers can be used during inference while running a TensorFlow Lite model. Since this patch would need a TensorFlow compilation from scratch, we provide a set of Docker environments for convenience.
 
 # Dependencies

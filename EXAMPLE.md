@@ -1,7 +1,5 @@
 # End-to-end example of Axolotl with ResNet-18 and CIFAR-10
 
-[[_TOC_]]
-
 This document illustrates  and end-to-end example of how to use Axolotl using the ResNet-18 model and CIFAR-10 dataset provided with this repository.
 
 ## Preliminary note
