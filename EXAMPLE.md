@@ -62,6 +62,35 @@ You should have noticed that we used specific values for the dropout rate to use
 
 The above commands should have generated the new files `experiment_models/tf/ll_mcdo.h5`, `experiment_models/tf/partial_mcdo.h5` and `experiment_models/tf/full_mcdo.h5`. Each of those files are the same model as the vanilla ResNet-18 model generated in the first step, but with dropout layers added accordingly. As before, none of the new models is trained. As a final remainder, the dropout layers will run during both training and inference. 
 
+As an important notice in this step, different information will be printed when executing one of the above commands. Below an example of the partial MCDO case. The information provided is meant to be used to understand future performance when branching the model later.
+
+```
+################################################################################
+# Summary                                                                      #
+################################################################################
+
+* NOTE: Following data considers batch size equal to 1
+
+* INFO: Total number of layers includes any layer in the model (e.g., input and activation layers
+* INFO: OPS refers to expected F32 operations that will execute during 1 forward pass
+* INFO: Backbone is the part of the model were no dropout layers have been inserted
+* INFO: MCDO refers to the part of the models were dropout layers have been inserted
+* INFO: MCDO OPS will be increase linearly with the number of branches created using the `branch` subcommand
+
+- Total number of layers on original model: 72
+- Number of dropout layers inserted:        12
+- Original model OPS:                       0.08183 G
+- MCDO model OPS:                           0.08204 G
+    + Backbone OPS:                         0.03668 G
+    + MCDO OPS:                             0.04536 G
+```
+
+In this example, when branching the model, only the `MCDO model OPS` will increase with the number of branches, meaning that, the total number of operations in our MCDO model after branching would be:
+
+```
+OPS = original_model_OPS + ( MCDO_model_OPS x number_of_branches)
+```
+
 ## Training the models
 
 Now that we have all the TensorFlow models, it is time to train the models. For training, we use the CIFAR-10 dataset. As before, we need to use a subcommand, in this case, the `train` one.

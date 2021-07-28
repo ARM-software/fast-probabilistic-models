@@ -54,7 +54,7 @@ python ResNet18.py build --save_to ./experiment_models --save_filename fp32_vani
 
 The next, and optional, step is to add MCDO to the model. For this, you will need to know first from which branch you want to start adding Dropout layers. You will need the layer name of it. You can get this information by inspecting the model with [Netron](https://netron.app) or by using `tf.keras.models.Model.summary()`.
 
-The script will add Dropout layers to any convolutional or dense layer starting from the layer specified.
+The script will add Dropout layers to any convolutional or dense layer starting from the layer specified. On top of the that, this script will inform about the overhead added by the dropout layers. An example of this can be found in the [end-to-end example](EXAMPLE.md).
 
 ### Usage
 
