@@ -2,7 +2,7 @@
 
 # Introduction
 
-This repository introduces Axolotl, an Arm-developed framework that can generate probabilistic models from, virtually, any ML model.
+This repository introduces Axolotl, an Arm-developed framework that can generate probabilistic models from, virtually, any DNN model.
 
 Axolotl provides use cases for:
 - Building a model
