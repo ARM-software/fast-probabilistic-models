@@ -17,7 +17,7 @@ Probabilistic models use sampling to provide uncertainty. Axolotl also provides 
 
 # Why use this repository
 
-Axolotl a framework to enable probabilistic ML experiments. We have included an example with ResNet-18 and CIFAR-10. The main addition is the inclusion of two different functionalities:
+Axolotl a framework to enable probabilistic ML experiments. We have included an example with ResNet-20 and CIFAR-10. The main addition is the inclusion of two different functionalities:
 
 1. Automatic addition of Dropout layers into a model
 2. Automatic branching of a model with Dropout layers inserted with the step above
@@ -40,14 +40,14 @@ Below an example of the code structure. Please note that, in order to improve re
 
 ```
 root_folder
-    |- ResNet18.py              # entry point for ResNet-18 experiments
+    |- ResNet20.py              # entry point for ResNet-20 experiments
     |- models                   # folder containing model-dependent code
-    |   |- resnet18             # folder containing resnet18-dependent code
-    |       |- model.py         # contains the necessary code to build and compile a ResNet-18 model
-    |       |- trainer.py       # contains the necessary code to train a ResNet-18 model
-    |       |- inferencer.py    # contains the necessary code to run inference on a ResNet-18 model
-    |       |- benchmarker.py   # contains the necessary code to benchmark a ResNet-18 model
-    |       |- converter.py     # contains the necessary code to convert (and quantize) a ResNet-18 model to TFLite
+    |   |- resnet20             # folder containing resnet20-dependent code
+    |       |- model.py         # contains the necessary code to build and compile a ResNet-20 model
+    |       |- trainer.py       # contains the necessary code to train a ResNet-20 model
+    |       |- inferencer.py    # contains the necessary code to run inference on a ResNet-20 model
+    |       |- benchmarker.py   # contains the necessary code to benchmark a ResNet-20 model
+    |       |- converter.py     # contains the necessary code to convert (and quantize) a ResNet-20 model to TFLite
     |- datasets                 # folder containing dataset-specific code
     |   |- cifar10.py           # contains the necessary code to prepare and process CIFAR-10 dataset
     |   |- mockup.py            # contains the necessary code to generate random data valid for a given model
@@ -67,18 +67,18 @@ Refer to [RUNNING.md](RUNNING.md).
 
 # Pre-trained models
 
-We provide a set of pre-trained ResNet-18 models with and without MCDO. These models are located inside the [experiment_models](experiment_models) folder. The folder contains the following models:
+We provide a set of pre-trained ResNet-20 models with and without MCDO. These models are located inside the [experiment_models](experiment_models) folder. The folder contains the following models:
 
 - TensorFlow models
-  - FP32 vanilla ResNet-18
-  - FP32 Last-Layer MCDO ResNet-18
-  - FP32 Partial MCDO ResNet-18
-  - FP32 Full MCDO ResNet-18
+  - FP32 vanilla ResNet-20
+  - FP32 Last-Layer MCDO ResNet-20
+  - FP32 Partial MCDO ResNet-20
+  - FP32 Full MCDO ResNet-20
 - TensorFlow Lite models
-  - FP32 and INT8 vanilla ResNet-18
-  - FP32 and INT8 Last-Layer MCDO ResNet-18
-  - FP32 and INT8 Partial MCDO ResNet-18
-  - FP32 and INT8 Full MCDO ResNet-18
+  - FP32 and INT8 vanilla ResNet-20
+  - FP32 and INT8 Last-Layer MCDO ResNet-20
+  - FP32 and INT8 Partial MCDO ResNet-20
+  - FP32 and INT8 Full MCDO ResNet-20
 
 For a full guide on how those models were generated and the results one should expect from them, please refer to [EXAMPLE.md](EXAMPLE.md).
 

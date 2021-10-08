@@ -65,7 +65,7 @@ do
     do
         modelName=`basename -s .${extension} $model`
         echo "[`date +%T`] Benchmarking model ${modelName} with batch size ${batch_size}"
-        metrics=`python ResNet18.py benchmark --model $model --batch ${batch_size} --repeats 100 --no-header`
+        metrics=`python ResNet20.py benchmark --model $model --batch ${batch_size} --repeats 100 --no-header`
         echo "${modelName},${batch_size},${metrics}" >> ${outputFile}
     done
 done
@@ -82,7 +82,7 @@ then
         do
             modelName=`basename -s .${extension} $model`
             echo "[`date +%T`] Benchmarking model ${modelName} with batch size ${batch_size}"
-            metrics=`python ResNet18.py benchmark --model $model --batch ${batch_size} --repeats 100 --no-header`
+            metrics=`python ResNet20.py benchmark --model $model --batch ${batch_size} --repeats 100 --no-header`
             echo "${modelName},${batch_size},${metrics}" >> ${outputFile}
         done
     done

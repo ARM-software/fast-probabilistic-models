@@ -1,6 +1,6 @@
 # Using this framework
 
-`ResNet18.py` provides different subcommands for different tasks. The workflow for the example provided in this repository would be:
+`ResNet20.py` provides different subcommands for different tasks. The workflow for the example provided in this repository would be:
 
 1. Build the model
 1. **(Optional)** Add MCDO to the model
@@ -10,30 +10,30 @@
 1. Run inference on the model
 1. Benchmark the model
 
-The workflow stated above represents a full use of this framework. For example, if you already have a trained ResNet-18 model and you only want to understand how adding MCDO to the model affects accuracy and ECE, you would only do step `2`, `4`, `5` and `6`.
+The workflow stated above represents a full use of this framework. For example, if you already have a trained ResNet-20 model and you only want to understand how adding MCDO to the model affects accuracy and ECE, you would only do step `2`, `4`, `5` and `6`.
 
 # Fast start
 
-We provide end-to-end scripts for running a full example with ResNet-18 using CIFAR-10 and CIFAR-10-corrupted in [scripts/prepare_resnet18.sh](scripts/prepare_resnet18.sh) and [scripts/inference_resnet18.sh](scripts/inference_resnet18.sh). You can use this scripts as following:
+We provide end-to-end scripts for running a full example with ResNet-20 using CIFAR-10 and CIFAR-10-corrupted in [scripts/prepare_resnet20.sh](scripts/prepare_resnet20.sh) and [scripts/inference_resnet20.sh](scripts/inference_resnet20.sh). You can use this scripts as following:
 
 ```bash
-# Prepare the ResNet18 models by building, adding MCDO, training, branching and conversion to TFLite
-./scripts/prepare_resnet18.sh
+# Prepare the ResNet20 models by building, adding MCDO, training, branching and conversion to TFLite
+./scripts/prepare_resnet20.sh
 
 # Run inference on the TFLite models
-./scripts/inference_resnet18.sh tflite
+./scripts/inference_resnet20.sh tflite
 ```
 
 After everything is executed, you should have four PDF files with names `fp32_acc.pdf`, `fp32_ece.pdf`, `int8_acc.pdf` and `int8_ece.pdf`.
 
 ## Build the model
 
-Building the model is the first step of the experiment. The following commands will create a ResNet-18 model prepared to use with a CIFAR-10 dataset.
+Building the model is the first step of the experiment. The following commands will create a ResNet-20 model prepared to use with a CIFAR-10 dataset.
 
 ### Usage
 
 ```bash
-usage: ResNet18.py build [-h] [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}]
+usage: ResNet20.py build [-h] [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -47,7 +47,7 @@ optional arguments:
 ### Example
 
 ```bash
-python ResNet18.py build --save_to ./experiment_models --save_filename fp32_vanilla --save_format h5
+python ResNet20.py build --save_to ./experiment_models --save_filename fp32_vanilla --save_format h5
 ```
 
 ## Add MCDO to the model
@@ -59,12 +59,12 @@ The script will add Dropout layers to any convolutional or dense layer starting 
 ### Usage
 
 ```bash
-usage: ResNet18.py mcdo [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}] --starting_layer
+usage: ResNet20.py mcdo [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}] --starting_layer
                         STARTING_LAYER [--droprate DROPRATE]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --model MODEL         Path to ResNet18 saved model to load. If not provided a new model will be created
+  --model MODEL         Path to ResNet20 saved model to load. If not provided a new model will be created
   --save_to SAVE_TO     Path to folder where to store the model. Folder will be created if it does not exist
   --save_filename SAVE_FILENAME
                         Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}
@@ -78,7 +78,7 @@ optional arguments:
 ### Example
 
 ```bash
-python ResNet18.py mcdo --model ./experiment_models/fp32_vanilla.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --save_format h5 --starting_layer dense --droprate 0.319811
+python ResNet20.py mcdo --model ./experiment_models/fp32_vanilla.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --save_format h5 --starting_layer dense --droprate 0.319811
 ```
 
 ## Train the model
@@ -88,13 +88,13 @@ After your model is ready (i.e., the model is build and, optionally, MCDO has be
 ### Usage
 
 ```bash
-usage: ResNet18.py train [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}] [--epochs EPOCHS]
+usage: ResNet20.py train [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}] [--epochs EPOCHS]
                          [--batch BATCH] [--initial_learning_rate INITIAL_LEARNING_RATE] [--ckpt_path CKPT_PATH]
                          [--tensorboard_logdir TENSORBOARD_LOGDIR]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --model MODEL         Path to ResNet18 saved model to load. If not provided a new model will be created
+  --model MODEL         Path to ResNet20 saved model to load. If not provided a new model will be created
   --save_to SAVE_TO     Path to folder where to store the model. Folder will be created if it does not exist
   --save_filename SAVE_FILENAME
                         Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}
@@ -113,7 +113,7 @@ optional arguments:
 ### Example
 
 ```bash
-python ResNet18.py train --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --save_format h5 --epochs 200 --batch 16 --initial_learning_rate 0.000313
+python ResNet20.py train --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --save_format h5 --epochs 200 --batch 16 --initial_learning_rate 0.000313
 ```
 
 ## Branch the model
@@ -125,12 +125,12 @@ After using this script, your model will have as many outputs as branches.
 ### Usage
 
 ```bash
-usage: ResNet18.py branch [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}]
+usage: ResNet20.py branch [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--save_format {h5,tf}]
                           [--n_branches {2,3,4,5,6,7,8,9,10}]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --model MODEL         Path to ResNet18 saved model to load. If not provided a new model will be created
+  --model MODEL         Path to ResNet20 saved model to load. If not provided a new model will be created
   --save_to SAVE_TO     Path to folder where to store the model. Folder will be created if it does not exist
   --save_filename SAVE_FILENAME
                         Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}
@@ -143,7 +143,7 @@ optional arguments:
 ### Example
 
 ```bash
-python ResNet18.py --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --save_format h5 --n_branches 5
+python ResNet20.py --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --save_format h5 --n_branches 5
 ```
 
 ## Convert to TensorFlow Lite
@@ -153,11 +153,11 @@ At this point, if you need it, you can convert the trained model to TensorFlow L
 ### Usage
 
 ```bash
-usage: ResNet18.py convert [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--int8]
+usage: ResNet20.py convert [-h] --model MODEL [--save_to SAVE_TO] [--save_filename SAVE_FILENAME] [--int8]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --model MODEL         Path to ResNet18 saved model to load
+  --model MODEL         Path to ResNet20 saved model to load
   --save_to SAVE_TO     Path to folder where to store the model. Folder will be created if it does not exist
   --save_filename SAVE_FILENAME
                         Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}
@@ -168,10 +168,10 @@ optional arguments:
 
 ```bash
 # To generate FP32 TFLite model
-python ResNet18.py convert --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo
+python ResNet20.py convert --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo
 
 # To generate quantized INT8 TFLite model
-python ResNet18.py convert --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --int8
+python ResNet20.py convert --model ./experiment_models/fp32_ll_mcdo.h5 --save_to ./experiment_models --save_filename fp32_ll_mcdo --int8
 ```
 
 ## Run inference on the model
@@ -181,13 +181,13 @@ To run inference on the model and get accuracy metrics, along with ECE, Brier sc
 ### Usage
 
 ```bash
-usage: ResNet18.py inference [-h] --model MODEL
+usage: ResNet20.py inference [-h] --model MODEL
                              [--corruption {brightness,contrast,defocus_blur,elastic,fog,frost,frosted_glass_blur,gaussian_blur,gaussian_noise,impulse_noise,jpeg_compression,motion_blur,pixelate,saturate,shot_noise,snow,spatter,speckle_noise,zoom_blur}]
                              [--corruption_level {1,2,3,4,5}] [--batch BATCH] [--no-header]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --model MODEL         Path to ResNet18 saved model to load
+  --model MODEL         Path to ResNet20 saved model to load
   --corruption {brightness,contrast,defocus_blur,elastic,fog,frost,frosted_glass_blur,gaussian_blur,gaussian_noise,impulse_noise,jpeg_compression,motion_blur,pixelate,saturate,shot_noise,snow,spatter,speckle_noise,zoom_blur}
                         Name of the corruption type to use with CIFAR-10
   --corruption_level {1,2,3,4,5}
@@ -200,10 +200,10 @@ optional arguments:
 
 ```bash
 # Use CIFAR-10
-python ResNet18.py inference --model ./experiment_models/int8_ll_mcdo.tflite --batch 1
+python ResNet20.py inference --model ./experiment_models/int8_ll_mcdo.tflite --batch 1
 
 # Use CIFAR-10-C, with corruption saturate and corruption level 3
-python ResNet18.py inference --model ./experiment_models/int8_ll_mcdo.tflite --batch 1 --corruption saturate --corruption_level 3
+python ResNet20.py inference --model ./experiment_models/int8_ll_mcdo.tflite --batch 1 --corruption saturate --corruption_level 3
 ```
 
 ### Plot inference results
@@ -234,11 +234,11 @@ We offer a small tool to benchmark the model with synthetic data. This script wi
 ### Usage
 
 ```bash
-usage: ResNet18.py benchmark [-h] --model MODEL [--repeats REPEATS] [--batch BATCH] [--no-header]
+usage: ResNet20.py benchmark [-h] --model MODEL [--repeats REPEATS] [--batch BATCH] [--no-header]
 
 optional arguments:
   -h, --help         show this help message and exit
-  --model MODEL      Path to ResNet18 saved model to load
+  --model MODEL      Path to ResNet20 saved model to load
   --repeats REPEATS  Number of times to run inference
   --batch BATCH      Batch size to use during benchmarking
   --no-header        Do not print header on the output. Useful to generate CSV files from multiple runs
@@ -247,5 +247,5 @@ optional arguments:
 ### Example
 
 ```bash
-python ResNet18.py benchmark --model ./experiment_models/int8_ll_mcdo.tflite --repeats 1000 --batch 32
+python ResNet20.py benchmark --model ./experiment_models/int8_ll_mcdo.tflite --repeats 1000 --batch 32
 ```

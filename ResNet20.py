@@ -19,7 +19,7 @@ limitations under the License.
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from datasets import cifar10, mockup
-from models.resnet18 import model, trainer, parser, inferencer, benchmarker, converter
+from models.resnet20 import model, trainer, parser, inferencer, benchmarker, converter
 from common import mcdo, brancher
 from common import utils
 import sys
@@ -149,7 +149,7 @@ def inference(args):
     predictions, true_labels = inference.run(my_model.model)
 
     # Process predictions
-    # ResNet-18 outputs a (N, 1, 10) where N == samples
+    # ResNet-20 outputs a (N, 1, 10) where N == samples
     # If using MCDO, then it will output (M, N, 1, 10), where M == number of branches and N == samples
     if predictions.ndim == 3:
         preds, lower_lim, upper_lim, std_preds = utils.calculate_output(predictions)

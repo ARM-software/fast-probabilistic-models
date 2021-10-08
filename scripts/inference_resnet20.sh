@@ -19,10 +19,10 @@
 ################################################################################
 
 runInferenceCorrupted() {
-    python ResNet18.py inference --model ${1} --batch ${2} --corruption ${3} --corruption_level ${4} | grep -A1 "accuracy" | tail -n1 >> ${5}
+    python ResNet20.py inference --model ${1} --batch ${2} --corruption ${3} --corruption_level ${4} | grep -A1 "accuracy" | tail -n1 >> ${5}
 }
 runInference() {
-    python ResNet18.py inference --model ${1} --batch ${2} | grep -A1 "accuracy" | tail -n1 >> ${3}
+    python ResNet20.py inference --model ${1} --batch ${2} | grep -A1 "accuracy" | tail -n1 >> ${3}
 }
 export -f runInferenceCorrupted
 export -f runInference

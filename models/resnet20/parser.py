@@ -52,13 +52,13 @@ def parse_args():
     ################################################################################
     # Parser for command build
     ################################################################################
-    build_parser = subparsers.add_parser('build', help='Subcommand for building a ResNet18 model')
+    build_parser = subparsers.add_parser('build', help='Subcommand for building a ResNet20 model')
     build_parser.add_argument('--save_to',
                               type=str,
                               default='./saved_models',
                               help='Path to folder where to store the model. Folder will be created if it does not exist')
     build_parser.add_argument('--save_filename',
-                              type=str, default='resnet18',
+                              type=str, default='resnet20',
                               help='Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}')
     build_parser.add_argument('--save_format',
                               type=str,
@@ -72,17 +72,17 @@ def parse_args():
     ################################################################################
     # Parser for command train
     ################################################################################
-    train_parser = subparsers.add_parser('train', help='Subcommand for training ResNet18 models')
+    train_parser = subparsers.add_parser('train', help='Subcommand for training ResNet20 models')
     train_parser.add_argument('--model',
                               type=str,
                               required=True,
-                              help='Path to ResNet18 saved model to load. If not provided a new model will be created')
+                              help='Path to ResNet20 saved model to load. If not provided a new model will be created')
     train_parser.add_argument('--save_to',
                               type=str,
                               default='./saved_models',
                               help='Path to folder where to store the model. Folder will be created if it does not exist')
     train_parser.add_argument('--save_filename',
-                              type=str, default='resnet18',
+                              type=str, default='resnet20',
                               help='Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}')
     train_parser.add_argument('--save_format',
                               type=str,
@@ -103,7 +103,7 @@ def parse_args():
                               help='Initial learning rate to use')
     train_parser.add_argument('--ckpt_path',
                               type=str,
-                              default='./checkpoints/resnet18/cp_best.ckpt',
+                              default='./checkpoints/resnet20/cp_best.ckpt',
                               help='Path where to store checkpoints')
     train_parser.add_argument('--tensorboard_logdir',
                               type=str,
@@ -119,13 +119,13 @@ def parse_args():
     mcdo_parser.add_argument('--model',
                              type=str,
                              required=True,
-                             help='Path to ResNet18 saved model to load. If not provided a new model will be created')
+                             help='Path to ResNet20 saved model to load. If not provided a new model will be created')
     mcdo_parser.add_argument('--save_to',
                              type=str,
                              default='./saved_models',
                              help='Path to folder where to store the model. Folder will be created if it does not exist')
     mcdo_parser.add_argument('--save_filename',
-                             type=str, default='mcdo_resnet18',
+                             type=str, default='mcdo_resnet20',
                              help='Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}')
     mcdo_parser.add_argument('--save_format',
                              type=str,
@@ -151,13 +151,13 @@ def parse_args():
     branch_parser.add_argument('--model',
                              type=str,
                              required=True,
-                             help='Path to ResNet18 saved model to load. If not provided a new model will be created')
+                             help='Path to ResNet20 saved model to load. If not provided a new model will be created')
     branch_parser.add_argument('--save_to',
                              type=str,
                              default='./saved_models',
                              help='Path to folder where to store the model. Folder will be created if it does not exist')
     branch_parser.add_argument('--save_filename',
-                             type=str, default='branched_resnet18',
+                             type=str, default='branched_resnet20',
                              help='Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}')
     branch_parser.add_argument('--save_format',
                              type=str,
@@ -180,7 +180,7 @@ def parse_args():
     inference_parser.add_argument('--model',
                                   type=str,
                                   required=True,
-                                  help='Path to ResNet18 saved model to load')
+                                  help='Path to ResNet20 saved model to load')
     inference_parser.add_argument('--corruption',
                                   type=str, choices=valid_corruptions,
                                   help='Name of the corruption type to use with CIFAR-10')
@@ -207,7 +207,7 @@ def parse_args():
     benchmark_parser.add_argument('--model',
                                   type=str,
                                   required=True,
-                                  help='Path to ResNet18 saved model to load')
+                                  help='Path to ResNet20 saved model to load')
     benchmark_parser.add_argument('--repeats',
                                   type=int,
                                   default=100,
@@ -230,13 +230,13 @@ def parse_args():
     convert_parser.add_argument('--model',
                                 type=str,
                                 required=True,
-                                help='Path to ResNet18 saved model to load')
+                                help='Path to ResNet20 saved model to load')
     convert_parser.add_argument('--save_to',
                                 type=str,
                                 default='./saved_models',
                                 help='Path to folder where to store the model. Folder will be created if it does not exist')
     convert_parser.add_argument('--save_filename',
-                                 type=str, default='resnet18',
+                                 type=str, default='resnet20',
                                  help='Filename to give to the model that will be saved. Saved model will be in <save_to>/<save_filename>{.save_format}')
     convert_parser.add_argument('--int8',
                                 action='store_true',

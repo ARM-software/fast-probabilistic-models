@@ -24,8 +24,8 @@ tflite_model_path='./experiment_models/tflite'
 mkdir -p ${tf_model_path} ${tflite_model_path}
 
 # STEP 1: Build the vanilla model
-echo "[`date +%T`] Building vanilla ResNet18 model"
-python ResNet18.py build --save_to ${tf_model_path} \
+echo "[`date +%T`] Building vanilla ResNet20 model"
+python ResNet20.py build --save_to ${tf_model_path} \
                          --save_filename vanilla \
                          --save_format h5
 
@@ -46,8 +46,8 @@ do
         #TODO: find the best droprate for this MCDO variant
         droprate=0.054988
     fi
-    echo "[`date +%T`] Generating MCDO variant ${mcdo_kind} of ResNet18 with a droprate of ${droprate}"
-    python ResNet18.py mcdo --model ${tf_model_path}/vanilla.h5 \
+    echo "[`date +%T`] Generating MCDO variant ${mcdo_kind} of ResNet20 with a droprate of ${droprate}"
+    python ResNet20.py mcdo --model ${tf_model_path}/vanilla.h5 \
         --save_to ${tf_model_path} \
         --save_filename ${mcdo_kind} \
         --save_format h5 \
@@ -82,7 +82,7 @@ do
     fi
 
     echo "[`date +%T`] Training ${modelFilename} model"
-    python ResNet18.py train --model ${tf_model_path}/${modelFilename}.h5 \
+    python ResNet20.py train --model ${tf_model_path}/${modelFilename}.h5 \
                              --save_to ${tf_model_path} \
                              --save_filename ${modelFilename} \
                              --save_format h5 \
@@ -97,7 +97,7 @@ for kind in ll_mcdo partial_mcdo full_mcdo
 do
     modelFilename="${kind}"
     echo "[`date +%T`] Branching ${modelFilename} model"
-    python ResNet18.py branch --model ${tf_model_path}/${modelFilename}.h5 \
+    python ResNet20.py branch --model ${tf_model_path}/${modelFilename}.h5 \
         --save_to ${tf_model_path} \
         --save_filename ${modelFilename} \
         --save_format h5 \
@@ -113,11 +113,11 @@ do
         echo "[`date +%T`] Generating TFLite model from ${model_name} using ${prec^^} precision"
         if [ "$prec" == "fp32" ]
         then
-            python ResNet18.py convert --model ${tf_model_path}/${model} \
+            python ResNet20.py convert --model ${tf_model_path}/${model} \
                                        --save_to ${tflite_model_path} \
                                        --save_filename ${prec}_${model_name}
         else
-            python ResNet18.py convert --model ${tf_model_path}/${model} \
+            python ResNet20.py convert --model ${tf_model_path}/${model} \
                                        --save_to ${tflite_model_path} \
                                        --save_filename ${prec}_${model_name} \
                                        --int8
@@ -126,4 +126,4 @@ do
 done
 
 # STEP 6: Run inference... but use another script
-echo "All models have been generated, you can now use scripts/inference_resnet18.sh"
+echo "All models have been generated, you can now use scripts/inference_resnet20.sh"

@@ -69,7 +69,7 @@ def transitional_block(inputs, filters):
 
 class Model:
     def __init__(self):
-        self.name = 'resnet18'
+        self.name = 'resnet20'
         self.num_classes = 10
 
     def build(self):
