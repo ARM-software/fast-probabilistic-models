@@ -142,8 +142,8 @@ RUN mkdir /bazel && \
 # Install pre-built Tensorflow
 ARG TF_PACKAGE=tensorflow-gpu
 ARG TF_PACKAGE_VERSION=2.4.1
-COPY required_files/tensorflow-2.4.1-cp38-cp38m-linux_x86_64.whl /tmp/tensorflow-2.4.1-cp38-cp38m-linux_x86_64.whl
-RUN python3.8 -m pip install --no-cache-dir /tmp/tensorflow-2.4.1-cp38-cp38m-linux_x86_64.whl
+COPY required_files/tensorflow-2.4.1-cp38-cp38-linux_x86_64.whl /tmp/tensorflow-2.4.1-cp38-cp38-linux_x86_64.whl
+RUN python3.8 -m pip install --no-cache-dir /tmp/tensorflow-2.4.1-cp38-cp38-linux_x86_64.whl
 
 # Install TensorFlow datasets
 RUN python3.8 -m pip --no-cache-dir install tensorflow_datasets
